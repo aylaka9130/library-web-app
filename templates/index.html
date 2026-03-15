@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      Library <span>&nbsp;MS</span>
+      <button class="close-sb" onclick="closeSidebar()">✕</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="sb-section">
+      <div class="sb-label">📊 Overview</div>
+      <div class="stat-row"><span class="ico">📚</span><span class="lbl">Total Books</span><span class="val" id="sTotal">0</span></div>
+      <div class="stat-row"><span class="ico">🏷️</span><span class="lbl">Categories</span><span class="val" id="sCats">0</span></div>
+      <div class="stat-row"><span class="ico">🗂️</span><span class="lbl">Rack Slots</span><span class="val" id="sRacks">0</span></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="sb-section">
+      <div class="sb-label">⚙️ Actions</div>
+      <button class="sb-btn modify"   onclick="openModify(); closeSidebar()">✏️ Modify a Book</button>
+      <button class="sb-btn danger"   onclick="deleteAllBooks(); closeSidebar()">🗑️ Delete All Books</button>
+      <button class="sb-btn download" onclick="downloadCSV(); closeSidebar()">⬇️ Download Book List</button>
+      <button class="sb-btn printbtn" onclick="printList()">🖨️ Print Book List</button>
+    </div>
+
+    <div class="sb-footer">Library Management System v2.0</div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <button class="menu-btn" onclick="openSidebar()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="logo">Library <span>MS</span></div>
+  </header>
+
+  <main>
+
+    <!-- Add Book Form -->
+    <div class="form-card">
+      <div class="sec-title">Add New Book</div>
+      <div class="form-grid">
+        <div class="field"><label>Sign Number</label><input type="text" id="signNo" placeholder="e.g. BK-001"/></div>
+        <div class="field"><label>Book Name</label><input type="text" id="bookName" placeholder="Title of the book"/></div>
+        <div class="field"><label>Author</label><input type="text" id="author" placeholder="Author name"/></div>
+        <div class="field"><label>Publisher</label><input type="text" id="publisher" placeholder="Publisher"/></div>
+      </div>
+      <div class="form-grid r2">
+        <div class="field"><label>Category</label><input type="text" id="category" placeholder="e.g. Fiction, Science…"/></div>
+        <div class="field"><label>Rack No</label><input type="text" id="rackNo" placeholder="Rack location"/></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addBook()">📖 Add Book</button>
+        <button class="btn btn-outline" onclick="clearForm()">✕ Clear</button>
+      </div>
+    </div>
+
+    <!-- Book Catalogue -->
+    <div class="catalogue-card">
+      <div class="cat-header">
+        <div class="sec-title" style="margin-bottom:0">Book Catalogue</div>
+        <div class="search-wrap">
+          <span class="si">🔍</span>
+          <input type="text" placeholder="Search books…" id="searchInput" oninput="renderTable()"/>
+        </div>
+        <div class="filter-tags">
+          <span class="tag active"   onclick="setFilter('all',this)">All</span>
+          <span class="tag inactive" onclick="setFilter('fiction',this)">Fiction</span>
+          <span class="tag inactive" onclick="setFilter('science',this)">Science</span>
+          <span class="tag inactive" onclick="setFilter('history',this)">History</span>
+          <span class="tag inactive" onclick="setFilter('tech',this)">Tech</span>
+        </div>
+      </div>
+
+      <table id="bookTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" class="checkbox-custom" onchange="toggleAll(this)"/></th>
+            <th>S.No</th>
+            <th>Sign Number</th>
+            <th>Book Name</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th>Category</th>
+            <th>Rack No</th>
+          </tr>
+        </thead>
+        <tbody id="bookTableBody"></tbody>
+      </table>
+
+      <div class="empty-state" id="emptyState">
+        <div class="ei">📭</div>
+        <p>No books found. Add your first book above.</p>
+      </div>
+
+      <div class="pagination" id="pag" style="display:none">
+        <span id="pageInfo">Showing 0 books</span>
+        <div class="page-btns"><button class="page-btn active">1</button></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODIFY MODAL -->
+  <div class="modal-bg" id="modifyModal">
+    <div class="modal">
+      <div class="modal-title">
+        ✏️ Modify a Book
+        <button class="modal-close" onclick="closeModify()">✕</button>
+      </div>
+      <div class="field" style="margin-bottom:1rem">
+        <label>Select Book</label>
+        <select id="modSel" onchange="loadMod()"></select>
+      </div>
+      <div class="modal-grid">
+        <div class="field"><label>Sign Number</label><input type="text" id="mSN"/></div>
+        <div class="field"><label>Book Name</label><input type="text" id="mBN"/></div>
+        <div class="field"><label>Author</label><input type="text" id="mAU"/></div>
+        <div class="field"><label>Publisher</label><input type="text" id="mPB"/></div>
+        <div class="field"><label>Category</label><input type="text" id="mCT"/></div>
+        <div class="field"><label>Rack No</label><input type="text" id="mRN"/></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModify()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveMod()">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="static/js/script.js"></script>
+</body>
+</html>
